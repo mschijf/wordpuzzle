@@ -1,5 +1,7 @@
 package ms.wordpuzzle
 
+import ms.wordpuzzle.lingo.GameRules
+import ms.wordpuzzle.lingo.LetterAnswerColor
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 

@@ -1,4 +1,4 @@
-package ms.wordpuzzle
+package ms.wordpuzzle.lingo
 
 class GameRules {
 
@@ -34,7 +34,7 @@ class GameRules {
     }
 
     private fun String.isPossible(guessWord: String, result: List<LetterAnswerColor>): Boolean {
-        val goodLetters = guessWord.filterIndexed { index, _ -> result[index] == LetterAnswerColor.ORANGE || result[index] == LetterAnswerColor.GREEN}
+        val goodLetters = guessWord.filterIndexed { index, _ -> result[index] == LetterAnswerColor.ORANGE || result[index] == LetterAnswerColor.GREEN }
         val redLetters = guessWord.filterIndexed { index, _ -> result[index] == LetterAnswerColor.RED }
 
         result.forEachIndexed { index, c ->

@@ -1,14 +1,15 @@
-package ms.wordpuzzle
+package ms.wordpuzzle.lingo
 
 import tool.mylambdas.distinct
 import kotlin.random.Random
 
 class AlgorithmQuality(private val wordList: List<String>) {
 
-    private val allResulCombinations = allResults(wordList.first().length)
     private val gameRules = GameRules()
+    private val firstGuess2 = guessAlgorithm2(wordList, wordList)
 
     fun maxAttemptsNecessary(): Int {
+        println("first guess = $firstGuess2")
         val map = wordList
             .map { word -> word  to wordList.maxAttemptsNecessaryWithWord(word) }
             .sortedByDescending { it.second }
@@ -20,9 +21,13 @@ class AlgorithmQuality(private val wordList: List<String>) {
         println("$chosenWord")
         var workingList = this
         var attemptCount = 0
+        val usedWordList = mutableListOf<String>()
         while (workingList.size > 1) {
 //            println("$attemptCount")
-            val guess = guessAlgorithm2(workingList)
+
+            val guess = if (attemptCount == 0) firstGuess2 else guessAlgorithm2(workingList, this-usedWordList)
+            usedWordList.add(guess)
+
             val answer = gameRules.verify(guess, chosenWord)
             workingList = gameRules.filterList(workingList, guess, answer)
             attemptCount++
@@ -45,38 +50,15 @@ class AlgorithmQuality(private val wordList: List<String>) {
             .maxBy { it.distinct().sumOf { letter -> letterCount[letter] ?: 0 } }
     }
 
-    fun guessAlgorithm2(list: List<String>): String {
-        var mini = Int.MAX_VALUE
-        var bestWord = ""
-        list.forEach { word ->
-            println("   examine word: $word")
-            var maxi = -1
-            allResulCombinations.forEach { result ->
-                val resultListSize = gameRules.filterList(list, word, result).size
-                if (resultListSize > maxi) {
-                    maxi = resultListSize
-                }
-            }
-            if (maxi < mini) {
-                mini = maxi
-                bestWord = word
-            }
+    fun guessAlgorithm2(possibleList: List<String>, chooseFromList: List<String>): String {
+        val xx = chooseFromList.associateWith { guessWord ->
+            possibleList.map { chosenWord -> gameRules.verify(guessWord, chosenWord) }
+                    .groupingBy { it }.eachCount()
+                    .values.max()
         }
+        val bestWord = xx.minBy { it.value }.key
+//        println(bestWord)
         return bestWord
-
-
-//        return list
-//            .minBy { word -> allResulCombinations.maxOf { result -> gameRules.filterList(list, word, result).size }  }
-    }
-
-    fun allResults(size: Int): List<List<LetterAnswerColor>> {
-        return if (size == 0) {
-            listOf(emptyList())
-        } else {
-            allResults(size-1).map { it + LetterAnswerColor.RED } +
-            allResults(size-1).map { it + LetterAnswerColor.ORANGE } +
-            allResults(size-1).map { it + LetterAnswerColor.GREEN }
-        }
     }
 
     fun doGuessRandom(list: List<String>): String {
